@@ -9,6 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<!-- Google Analytics (GA4) — placeholder ID, swap for EWA's real measurement ID once received -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
 </head>
 <body>
 <header>
@@ -30,7 +38,7 @@
   </div>
 </header>
 
-<section class="page-banner">
+<section class="page-banner-photo" style="--banner-img:url('/images/lae-banner.jpg');">
   <div class="page-banner-inner">
     <span class="coming-soon-badge">Coming Soon</span>
     <h1>Little Agroecology Explorers</h1>
@@ -39,7 +47,7 @@
 </section>
 
 <section class="section-cream">
-  <div class="wrap about-grid">
+  <div class="wrap about-grid reverse">
     <div>
       <div class="kicker-rule"></div>
       <h2 class="section-title">What's coming</h2>
@@ -47,15 +55,15 @@
       <p class="lede" style="margin-top:16px;">The first volume, <em>Little Agroecology Explorers: Stories &amp; Activity Book</em>, introduces the principles of agroecology through story and activity pages designed for young children and their teachers.</p>
       <ul class="check-list" style="margin-top:28px;">
         <li>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#C9A438" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#C9A438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#8A5A2B" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#8A5A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span><span class="label" style="color:var(--green-deep);">Agriculture</span><br><span class="desc" style="color:#444;">Introducing children to agroecology.</span></span>
         </li>
         <li>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#C9A438" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#C9A438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#8A5A2B" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#8A5A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span><span class="label" style="color:var(--green-deep);">Agribusiness</span><br><span class="desc" style="color:#444;">Farming as a viable business.</span></span>
         </li>
         <li>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#C9A438" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#C9A438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#8A5A2B" stroke-width="1.6"/><path d="M6 10l2.5 2.5L14 7" stroke="#8A5A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span><span class="label" style="color:var(--green-deep);">Environmental Protection</span><br><span class="desc" style="color:#444;">Learning to be good stewards of the environment.</span></span>
         </li>
       </ul>

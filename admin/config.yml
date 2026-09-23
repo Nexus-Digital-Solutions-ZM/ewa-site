@@ -36,15 +36,43 @@ collections:
         name: "growher"
         file: "content/pages/growher.md"
         fields:
-          - { label: "Intro Text", name: "intro", widget: "text" }
+          - { label: "Banner Image", name: "banner_image", widget: "image" }
+          - { label: "\"What it is\" Heading", name: "intro_heading", widget: "string" }
+          - { label: "\"What it is\" Text (paragraph 1)", name: "intro_text", widget: "text" }
+          - { label: "\"What it is\" Text (paragraph 2)", name: "intro_text_2", widget: "text" }
+          - { label: "\"What it is\" Image", name: "intro_image", widget: "image" }
+          - { label: "\"Who it's for\" Heading", name: "who_heading", widget: "string" }
+          - label: "\"Who it's for\" List"
+            name: "who_items"
+            widget: "list"
+            fields:
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Description", name: "desc", widget: "string" }
+          - { label: "\"How to get involved\" Heading", name: "involve_heading", widget: "string" }
+          - { label: "\"How to get involved\" Text", name: "involve_text", widget: "text" }
+          - { label: "Photo 1", name: "photo_1", widget: "image" }
+          - { label: "Photo 2", name: "photo_2", widget: "image" }
       - label: "Little Agroecology Explorers"
         name: "lae"
         file: "content/pages/lae.md"
         fields:
           - { label: "Status", name: "status", widget: "select", options: ["Coming Soon", "Live"] }
-          - { label: "Intro Text", name: "intro", widget: "text" }
+          - { label: "Banner Image", name: "banner_image", widget: "image" }
+          - { label: "\"What's coming\" Heading", name: "intro_heading", widget: "string" }
+          - { label: "\"What's coming\" Text (paragraph 1)", name: "intro_text", widget: "text" }
+          - { label: "\"What's coming\" Text (paragraph 2, supports *italics*)", name: "intro_text_2", widget: "text" }
+          - { label: "\"What's coming\" Image", name: "intro_image", widget: "image" }
+          - label: "Feature List"
+            name: "features"
+            widget: "list"
+            fields:
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Description", name: "desc", widget: "string" }
+          - { label: "Waitlist Heading", name: "waitlist_heading", widget: "string" }
+          - { label: "Waitlist Text", name: "waitlist_text", widget: "text" }
 
 # Note: No testimonies collection in Phase 1, per the Scope of Work (Section A5).
-# Programme page edits currently require a developer to wire into growher.html /
-# little-agroecology-explorers.html; the blog collection above is fully self-serve
-# and publishes automatically via scripts/build-blog.js on every deploy.
+# Programme page edits (growher.md / lae.md above) publish automatically via
+# scripts/build-pages.js on every deploy — no developer needed for text or image
+# changes on these pages. The blog collection publishes the same way via
+# scripts/build-blog.js. Both run as part of `npm run build`.
