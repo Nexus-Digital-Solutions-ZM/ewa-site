@@ -2,7 +2,7 @@ backend:
   name: github
   repo: Nexus-Digital-Solutions-ZM/ewa-site
   branch: main
-  base_url: https://elevatewomeninagroecology.vercel.app
+  base_url: https://elevatewomeninagroecology.org
   auth_endpoint: api/auth
 
 # GitHub OAuth backend (Vercel-friendly, no Netlify involved).
