@@ -1,7 +1,7 @@
-// Builds growher.html and little-agroecology-explorers.html from
-// content/pages/growher.md and content/pages/lae.md, so EWA admins can edit
-// these two programme pages through the CMS instead of asking a developer
-// for every small text/image change (Part A2 of the Scope of Work).
+// Builds growher.html, little-agroecology-explorers.html, and team.html from
+// content/pages/*.md, so EWA admins can edit these pages through the CMS
+// instead of asking a developer for every small text/image change
+// (Part A2 of the Scope of Work).
 //
 // Run via `npm run build` (see package.json) — Vercel runs this automatically
 // on every deploy, and it also runs whenever Decap CMS commits a change to
@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   ['/about.html', 'About'],
   ['/growher.html', 'GrowHer Urban'],
   ['/little-agroecology-explorers.html', 'Little Explorers'],
+  ['/team.html', 'Team'],
   ['/get-involved.html', 'Get Involved'],
   ['/blog/index.html', 'Updates'],
   ['/contact.html', 'Contact']
@@ -200,10 +201,58 @@ function buildLae() {
   }));
 }
 
+function memberCard(m) {
+  return `
+      <div class="leader-card">
+        <div class="leader-photo"><img src="${m.photo}" alt="${m.name}" loading="lazy"></div>
+        <div class="leader-body">
+          <h3>${m.name}</h3>
+          <div class="leader-role">${m.role}</div>
+          ${marked.parse(m.bio || '')}
+        </div>
+      </div>`;
+}
+
+function buildTeam() {
+  const d = loadPage('team.md');
+  const members = (d.members || []).map(memberCard).join('');
+
+  const body = `
+<section class="page-banner">
+  <div class="page-banner-inner">
+    <h1>${d.heading || 'Our team'}</h1>
+    <p>${d.intro || "The people leading EWA's work on the ground."}</p>
+  </div>
+</section>
+
+<section class="section-cream">
+  <div class="wrap">
+    <div class="leader-grid">${members}
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="section-title" style="margin:0 auto 14px;">Want to partner with EWA?</h2>
+    <p>Reach us directly on WhatsApp &mdash; one tap, any time.</p>
+    <a href="https://wa.me/260976634650" class="btn btn-green" target="_blank" rel="noopener">Message Us</a>
+  </div>
+</section>`;
+
+  fs.writeFileSync(path.join(ROOT, 'team.html'), shell({
+    title: 'Our Team',
+    description: "Meet the people leading EWA's work — Founder & CEO Grace Kacemba-Simbule and the team driving agroecology in Zambia.",
+    activeHref: '/team.html',
+    bodyHtml: body
+  }));
+}
+
 function main() {
   buildGrowher();
   buildLae();
-  console.log('Built growher.html and little-agroecology-explorers.html from content/pages/*.md');
+  buildTeam();
+  console.log('Built growher.html, little-agroecology-explorers.html, and team.html from content/pages/*.md');
 }
 
 main();
