@@ -3,7 +3,7 @@ backend:
   repo: Nexus-Digital-Solutions-ZM/ewa-site
   branch: main
   base_url: https://elevatewomeninagroecology.org
-  auth_endpoint: api/auth
+  auth_endpoint: /api/auth
 
 # GitHub OAuth backend (Vercel-friendly, no Netlify involved).
 # Set up: create a GitHub OAuth App -> add its Client ID/Secret as Vercel env vars
