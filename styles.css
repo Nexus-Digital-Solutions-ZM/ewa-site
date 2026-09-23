@@ -177,6 +177,7 @@ h2.section-title{font-size:clamp(1.9rem,3.4vw,2.5rem); margin-bottom:22px; max-w
 
 /* leadership */
 .leader-grid{display:grid; grid-template-columns:1fr 1fr; gap:44px; margin-top:40px;}
+.leader-grid:has(> :only-child){grid-template-columns:1fr; max-width:320px;}
 .leader-card{background:var(--green); border:1px solid var(--line); border-top:2px solid var(--gold);}
 .leader-photo{aspect-ratio:4/5; overflow:hidden;}
 .leader-photo img{width:100%; height:100%; object-fit:cover; object-position:top;}
