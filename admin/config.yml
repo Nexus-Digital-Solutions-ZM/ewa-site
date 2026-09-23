@@ -1,0 +1,50 @@
+backend:
+  name: github
+  repo: Nexus-Digital-Solutions-ZM/ewa-site
+  branch: main
+  base_url: https://elevatewomeninagroecology.vercel.app
+  auth_endpoint: api/auth
+
+# GitHub OAuth backend (Vercel-friendly, no Netlify involved).
+# Set up: create a GitHub OAuth App -> add its Client ID/Secret as Vercel env vars
+# (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET) -> the /api/auth and /api/callback
+# serverless functions in this repo handle the login handshake.
+# base_url must match your live Vercel domain (or custom domain once attached).
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: "blog"
+    label: "Updates / Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text", hint: "1-2 sentences shown in the Latest Updates preview and blog listing." }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "pages"
+    label: "Programme Pages"
+    files:
+      - label: "GrowHer Urban Initiative"
+        name: "growher"
+        file: "content/pages/growher.md"
+        fields:
+          - { label: "Intro Text", name: "intro", widget: "text" }
+      - label: "Little Agroecology Explorers"
+        name: "lae"
+        file: "content/pages/lae.md"
+        fields:
+          - { label: "Status", name: "status", widget: "select", options: ["Coming Soon", "Live"] }
+          - { label: "Intro Text", name: "intro", widget: "text" }
+
+# Note: No testimonies collection in Phase 1, per the Scope of Work (Section A5).
+# Programme page edits currently require a developer to wire into growher.html /
+# little-agroecology-explorers.html; the blog collection above is fully self-serve
+# and publishes automatically via scripts/build-blog.js on every deploy.

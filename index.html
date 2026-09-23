@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home | Elevate Women in Agroecology (EWA)</title>
+<meta name="description" content="Elevate Women in Agroecology (EWA) — growing people, protecting nature, and building sustainable food systems. Farming God's Way.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+  <div class="nav">
+    <a href="/index.html" class="brand">
+      <img src="/images/logo.jpg" alt="EWA logo">
+      Elevate Women in Agroecology
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('nav.links').classList.toggle('open')">&#9776;</button>
+    <nav class="links">
+      <a href="/index.html" class="active">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/growher.html">GrowHer Urban</a>
+      <a href="/little-agroecology-explorers.html">Little Explorers</a>
+      <a href="/get-involved.html">Get Involved</a>
+      <a href="/blog/index.html">Updates</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <img class="hero-logo" src="/images/logo.jpg" alt="EWA logo">
+    <p class="eyebrow-tag">&ldquo;Farming God's Way&rdquo; &mdash; Her Voice, Everyone's Future</p>
+    <h1>Elevate Women<br>in <em>Agroecology</em></h1>
+    <p class="tagline">Growing people. Protecting nature. Building sustainable food systems &mdash; led by women, rooted in community, and grounded in faith.</p>
+    <div class="hero-cta">
+      <a href="about.html" class="btn btn-gold">Who We Are</a>
+      <a href="https://wa.me/260965304101" class="btn btn-outline" target="_blank" rel="noopener">Get in Touch</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-cream" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="kicker-rule"></div>
+      <h2 class="section-title">Why it matters</h2>
+      <p class="lede">Across our communities, women grow the food that feeds families — yet too often without the training, resources, or recognition that agriculture deserves. EWA exists to change that: elevating women as agroecology leaders, protecting the land they depend on, and building food systems that last.</p>
+      <p class="lede" style="margin-top:16px;">From urban sack gardens to school learning programmes for children, EWA meets people where they are and grows with them.</p>
+      <div style="margin-top:26px;"><a href="about.html" class="btn btn-green">Read our full story &rarr;</a></div>
+    </div>
+    <div class="figure-frame"><img src="/images/growher-2.jpg" alt="Women tending a community garden"></div>
+  </div>
+</section>
+
+<section class="section-green" id="focus">
+  <div class="wrap">
+    <div class="kicker-rule"></div>
+    <h2 class="section-title" style="color:#fff;">Our focus areas</h2>
+    <p class="lede">Six areas guide everything we do.</p>
+    <div class="focus-grid">
+      <div class="focus-card"><h3>Agroecology Education</h3><p>Practical, farmer-to-farmer training in sustainable growing methods.</p></div>
+      <div class="focus-card"><h3>Environmental Stewardship</h3><p>Protecting soil, water, and biodiversity for the long term.</p></div>
+      <div class="focus-card"><h3>Women &amp; Youth Participation</h3><p>Putting women and young people at the centre of food systems.</p></div>
+      <div class="focus-card"><h3>Sustainable Food Systems</h3><p>Growing food in ways that nourish people without exhausting the land.</p></div>
+      <div class="focus-card"><h3>Agripreneurship</h3><p>Helping farmers turn good growing into viable, dignified livelihoods.</p></div>
+      <div class="focus-card"><h3>Community &amp; School Learning</h3><p>Bringing agroecology into classrooms and community spaces alike.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-cream">
+  <div class="wrap">
+    <div class="kicker-rule"></div>
+    <h2 class="section-title">Explore EWA</h2>
+    <div class="link-card-grid">
+      <a href="about.html" class="link-card"><h3>About EWA</h3><p>Our story, mission, and the communities we serve.</p></a>
+      <a href="growher.html" class="link-card"><h3>GrowHer Urban Initiative</h3><p>Urban farming through sack gardening — what it is and how to join.</p></a>
+      <a href="little-agroecology-explorers.html" class="link-card"><h3>Little Agroecology Explorers</h3><p>Animated learning-stories for children. Coming soon.</p></a>
+      <a href="get-involved.html" class="link-card"><h3>Get Involved</h3><p>Partner with, support, or volunteer alongside EWA.</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="section-green" id="updates">
+  <div class="wrap">
+    <div class="kicker-rule" style="background:var(--gold-soft);"></div>
+    <h2 class="section-title" style="color:#fff;">Latest Updates</h2>
+    <p class="lede">News and reflections from EWA &mdash; read more on our Updates page.</p>
+    <div id="latest-updates-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:36px;">
+      <div>Loading updates&hellip;</div>
+    </div>
+    <div style="margin-top:32px;">
+      <a href="/blog/index.html" class="btn btn-gold">Visit Updates</a>
+    </div>
+  </div>
+</section>
+<script>
+  fetch('/blog/latest.json')
+    .then(r => r.json())
+    .then(posts => {
+      const grid = document.getElementById('latest-updates-grid');
+      if (!posts.length) { grid.innerHTML = '<p>No posts yet &mdash; check back soon.</p>'; return; }
+      grid.innerHTML = posts.map(p => `
+        <a href="/blog/posts/${p.slug}.html" style="text-align:left; text-decoration:none; color:inherit; background:#fff; border-left:3px solid var(--gold); padding:18px;">
+          <div style="font-size:0.78rem; color:#8a7a4a; margin-bottom:6px;">${p.date}</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--green-deep); margin-bottom:6px;">${p.title}</div>
+          <div style="font-size:0.9rem; color:#444;">${p.excerpt}</div>
+        </a>`).join('');
+    })
+    .catch(() => {
+      document.getElementById('latest-updates-grid').innerHTML = '<p>Updates will appear here once posts are published.</p>';
+    });
+</script>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="section-title" style="margin:0 auto 14px;">Want to partner with EWA?</h2>
+    <p>Reach us directly on WhatsApp &mdash; one tap, any time.</p>
+    <a href="https://wa.me/260965304101" class="btn btn-green" target="_blank" rel="noopener">Message Us</a>
+  </div>
+</section>
+<footer>
+  &copy; 2026 Elevate Women in Agroecology (EWA) &mdash; Zambia. All rights reserved.<br>
+  Built and maintained by <a href="https://nexus-digital-solution.vercel.app" target="_blank" rel="noopener">Nexus Digital Solutions</a>
+</footer>
+
+<a class="floating-whatsapp" href="https://wa.me/260965304101" target="_blank" rel="noopener" aria-label="Message EWA on WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 3C9.4 3 4 8.4 4 15c0 2.3.6 4.4 1.7 6.3L4 29l7.9-1.6c1.8.9 3.9 1.4 6.1 1.4 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.7c-2 0-3.9-.5-5.5-1.5l-.4-.2-4.7 1 1-4.6-.2-.4C5.3 17.1 4.9 16 4.9 15c0-6.1 5-11.1 11.1-11.1S27.1 8.9 27.1 15 22.1 24.7 16 24.7zm6.1-8.3c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6 0-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8 0 1.7 1.2 3.3 1.4 3.5.2.2 2.4 3.7 5.8 5.1.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 2-.8 2.3-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.4z"/>
+  </svg>
+</a>
+</body>
+</html>
