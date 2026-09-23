@@ -70,9 +70,26 @@ collections:
               - { label: "Description", name: "desc", widget: "string" }
           - { label: "Waitlist Heading", name: "waitlist_heading", widget: "string" }
           - { label: "Waitlist Text", name: "waitlist_text", widget: "text" }
+      - label: "Team"
+        name: "team"
+        file: "content/pages/team.md"
+        fields:
+          - { label: "Page Heading", name: "heading", widget: "string", default: "Our team" }
+          - { label: "Intro Text", name: "intro", widget: "text", default: "The people leading EWA's work on the ground." }
+          - label: "Team Members"
+            name: "members"
+            widget: "list"
+            summary: "{{fields.name}} — {{fields.role}}"
+            fields:
+              - { label: "Full Name", name: "name", widget: "string" }
+              - { label: "Role / Title", name: "role", widget: "string" }
+              - { label: "Photo", name: "photo", widget: "image" }
+              - { label: "Bio", name: "bio", widget: "markdown" }
 
 # Note: No testimonies collection in Phase 1, per the Scope of Work (Section A5).
 # Programme page edits (growher.md / lae.md above) publish automatically via
 # scripts/build-pages.js on every deploy — no developer needed for text or image
 # changes on these pages. The blog collection publishes the same way via
 # scripts/build-blog.js. Both run as part of `npm run build`.
+# Team page (team.md above) follows the same pattern — build-pages.js generates
+# team.html from it. Adding a new team member is a CMS edit, no developer needed.
