@@ -1,5 +1,5 @@
 ---
-banner_image: /images/uploads/whatsapp-image-2026-09-23-at-2.30.10-pm.jpeg
+banner_image: /images/uploads/whatsapp-image-2026-09-22-at-3.56.59-pm.jpeg
 intro_heading: What it is
 intro_text: "GrowHer Urban Initiative teaches women to grow fresh vegetables in
   sack gardens — simple, low-cost planting sacks that turn a small yard, a
