@@ -15,9 +15,8 @@ const { marked } = require('marked');
 const ROOT = path.join(__dirname, '..');
 const PAGES_DIR = path.join(ROOT, 'content', 'pages');
 
-// GA4 measurement ID — placeholder until EWA/Nexus sends the real G-code.
-// Swap the value below (both places) once received.
-const GA_ID = 'G-XXXXXXXXXX';
+// GA4 measurement ID for EWA (provided by Simeon, 23 Sept 2026).
+const GA_ID = 'G-8C0PW1PDX9';
 
 const NAV_ITEMS = [
   ['/index.html', 'Home'],
@@ -47,7 +46,7 @@ function shell({ title, description, activeHref, bodyHtml }) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<!-- Google Analytics (GA4) — placeholder ID, swap for EWA's real measurement ID once received -->
+<!-- Google Analytics (GA4) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
