@@ -1,5 +1,5 @@
 ---
-banner_image: /images/growher-1.jpg
+banner_image: /images/growher-2.jpg
 intro_heading: What it is
 intro_text: >-
   GrowHer Urban Initiative teaches women to grow fresh vegetables in sack gardens — simple,
@@ -10,7 +10,7 @@ intro_text_2: >-
   Women in the programme learn organic growing methods, water-wise techniques, and how to
   keep a small garden productive year-round — skills that feed families first, and can grow
   into a small income as harvests increase.
-intro_image: /images/growher-1.jpg
+intro_image: /images/growher-2.jpg
 who_heading: Who it's for
 who_items:
   - label: Women in urban and peri-urban households
