@@ -151,6 +151,22 @@
     return map[ext] || "application/octet-stream";
   }
 
+  /**
+   * Decap 3.x's Implementation interface was historically documented
+   * (and written here) assuming `config`/`collection` are Immutable.js
+   * Maps accessed via `.get("key")`. This runtime (decap-cms-core 3.19.1)
+   * actually passes plain JS objects instead — confirmed by the runtime
+   * error "collection.get is not a function" / "this.config.get is not
+   * a function". This helper works with either shape so it's safe
+   * regardless of which Decap version/config-passing convention is
+   * actually in effect.
+   */
+  function cfgGet(obj, key, fallback) {
+    if (obj == null) return fallback;
+    var value = typeof obj.get === "function" ? obj.get(key) : obj[key];
+    return value === undefined ? fallback : value;
+  }
+
   function readFileAsBase64(file) {
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
@@ -243,7 +259,7 @@
    * tradeoff for EWA's current folder sizes, not an oversight.
    */
   NexusGatewayBackend.prototype.entriesByFolder = function (collection, extension) {
-    var folder = collection.get("folder");
+    var folder = cfgGet(collection, "folder");
     return authedJson("/entries?path=" + encodeURIComponent(folder)).then(function (listing) {
       var files = (listing.entries || []).filter(function (e) {
         return e.type === "file" && e.path.endsWith("." + extension);
@@ -304,7 +320,7 @@
    * the content=true param added to /entries for exactly this purpose.
    */
   NexusGatewayBackend.prototype.getMedia = function (folder) {
-    var mediaFolder = folder || (this.config && this.config.get("media_folder")) || "images/uploads";
+    var mediaFolder = folder || cfgGet(this.config, "media_folder") || "images/uploads";
     return authedJson(
       "/entries?path=" + encodeURIComponent(mediaFolder) + "&content=true"
     ).then(function (listing) {
@@ -322,7 +338,7 @@
 
   NexusGatewayBackend.prototype.persistMedia = function (file, opts) {
     opts = opts || {};
-    var mediaFolder = (this.config && this.config.get("media_folder")) || "images/uploads";
+    var mediaFolder = cfgGet(this.config, "media_folder") || "images/uploads";
     var path = mediaFolder + "/" + file.name;
 
     return readFileAsBase64(file.fileObj || file).then(function (base64) {
