@@ -42,6 +42,18 @@
   // https://nexus-cms-gateway.../admin/<this-value>
   var GATEWAY_CLIENT_ID = "REPLACE_WITH_EWA_CLIENT_ID";
 
+  if (GATEWAY_CLIENT_ID === "REPLACE_WITH_EWA_CLIENT_ID") {
+    // Fail loudly here rather than letting every request 404 against the
+    // Gateway with a generic "unknown client" error. Get the real value
+    // from the Gateway's /admin dashboard: click into EWA's client page
+    // and copy the id out of the URL (/admin/<clientId>).
+    throw new Error(
+      "[nexus-gateway-backend] GATEWAY_CLIENT_ID is still the placeholder \u2014 " +
+        "set it to EWA's real client id from the Gateway's /admin/<clientId> URL " +
+        "before this backend can talk to the Gateway."
+    );
+  }
+
   var API_BASE = GATEWAY_BASE_URL + "/api/cms/" + GATEWAY_CLIENT_ID;
 
   // ---------------------------------------------------------------------
