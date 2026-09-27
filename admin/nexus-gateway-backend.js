@@ -65,7 +65,7 @@
 
   function readHandoffFragment() {
     var hash = window.location.hash || "";
-    var match = /(?:^|[#&])nexus_handoff=([^&]+)/.exec(hash);
+    var match = /(?:^|[#&])\/?nexus_handoff=([^&]+)/.exec(hash);
     if (!match) return null;
     // Strip the fragment from the visible URL immediately so the token
     // doesn't linger in browser history / a shared screenshot any longer
