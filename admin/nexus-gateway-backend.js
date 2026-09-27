@@ -37,16 +37,10 @@
   // ---------------------------------------------------------------------
   var GATEWAY_BASE_URL = "https://nexus-cms-gateway.nexus-digital-solutions.workers.dev";
 
-  // TODO(Paul/Simeon): replace with EWA's real `clients.id` (a cuid) from
-  // the Gateway DB — visible in the URL when viewing EWA at
-  // https://nexus-cms-gateway.../admin/<this-value>
+  // EWA's real `clients.id` (a cuid) from the Gateway DB.
   var GATEWAY_CLIENT_ID = "cmujs8hwv0000psp77nvpz8la";
 
   if (GATEWAY_CLIENT_ID === "REPLACE_WITH_EWA_CLIENT_ID") {
-    // Fail loudly here rather than letting every request 404 against the
-    // Gateway with a generic "unknown client" error. Get the real value
-    // from the Gateway's /admin dashboard: click into EWA's client page
-    // and copy the id out of the URL (/admin/<clientId>).
     throw new Error(
       "[nexus-gateway-backend] GATEWAY_CLIENT_ID is still the placeholder \u2014 " +
         "set it to EWA's real client id from the Gateway's /admin/<clientId> URL " +
@@ -67,9 +61,6 @@
     var hash = window.location.hash || "";
     var match = /(?:^|[#&])\/?nexus_handoff=([^&]+)/.exec(hash);
     if (!match) return null;
-    // Strip the fragment from the visible URL immediately so the token
-    // doesn't linger in browser history / a shared screenshot any longer
-    // than necessary. history.replaceState doesn't trigger a navigation.
     var cleanUrl = window.location.pathname + window.location.search;
     window.history.replaceState(null, "", cleanUrl);
     return decodeURIComponent(match[1]);
@@ -164,7 +155,6 @@
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
       reader.onload = function () {
-        // reader.result is "data:<mime>;base64,<data>" — strip the prefix.
         var result = String(reader.result);
         var comma = result.indexOf(",");
         resolve(comma === -1 ? result : result.slice(comma + 1));
@@ -183,13 +173,7 @@
   function NexusGatewayBackend(config, options) {
     this.config = config;
     this.options = options || {};
-    // Kick off the exchange as soon as the backend is constructed (page
-    // load), rather than waiting for the user to click Decap's generic
-    // "Login" button — by the time they click, it's likely already done.
     ensureSession().catch(function (err) {
-      // Swallow here; authenticate() below surfaces the same error to
-      // Decap's login UI if the user does click through before this
-      // resolves (or if it failed).
       console.error("[nexus-gateway-backend] handoff exchange failed:", err);
     });
   }
@@ -198,8 +182,38 @@
     return false;
   };
 
-  // No custom login UI — Decap falls back to a generic "Login" button
-  // that calls authenticate({}) below when this returns null/undefined.
+  /**
+   * authComponent — NOT actually optional in this Decap bundle: the
+   * internal Backend wrapper calls `this.implementation.authComponent()`
+   * unconditionally (confirmed via runtime error "authComponent is not
+   * a function" when this method was removed entirely). It must exist
+   * AND return a valid React component (a function), not `null` itself
+   * — returning a bare `null` causes React error #130 ("element type is
+   * invalid ... got: null") because Decap renders the return value
+   * directly as `<AuthComponent />`.
+   *
+   * Since auth already happens via the handoff-token exchange (no user
+   * credentials needed), this returns a minimal function component that
+   * renders nothing and, on its first render, calls `props.onLogin({})`
+   * once (deferred via setTimeout so it doesn't fire synchronously
+   * during React's render phase, which is disallowed) to immediately
+   * trigger this.authenticate() below — auto-logging in with no visible
+   * login form.
+   */
+  NexusGatewayBackend.prototype.authComponent = function () {
+    var triggered = false;
+    return function NexusAutoAuth(props) {
+      if (!triggered) {
+        triggered = true;
+        setTimeout(function () {
+          if (props && typeof props.onLogin === "function") {
+            props.onLogin({});
+          }
+        }, 0);
+      }
+      return null;
+    };
+  };
 
   // We never persist the user, so Decap will always end up calling
   // authenticate() on load instead of skipping straight to "logged in".
@@ -275,7 +289,7 @@
           path: f.path,
           content: f.raw,
           message: message,
-          action: "update", // server-side writeFile resolves create-vs-update automatically
+          action: "update",
         }),
       });
     });
