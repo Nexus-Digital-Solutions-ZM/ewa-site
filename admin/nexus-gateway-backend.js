@@ -200,9 +200,6 @@
 
   // No custom login UI — Decap falls back to a generic "Login" button
   // that calls authenticate({}) below when this returns null/undefined.
-  NexusGatewayBackend.prototype.authComponent = function () {
-    return null;
-  };
 
   // We never persist the user, so Decap will always end up calling
   // authenticate() on load instead of skipping straight to "logged in".
