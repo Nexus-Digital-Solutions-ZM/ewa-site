@@ -163,7 +163,21 @@
    */
   function cfgGet(obj, key, fallback) {
     if (obj == null) return fallback;
-    var value = typeof obj.get === "function" ? obj.get(key) : obj[key];
+    var value;
+    if (typeof obj.get === "function") {
+      value = obj.get(key);
+    } else if (typeof obj.toJS === "function") {
+      value = obj.toJS()[key];
+    } else {
+      value = obj[key];
+    }
+    if (value === undefined) {
+      console.warn(
+        "[nexus-gateway-backend] cfgGet(\"" + key + "\") returned undefined. " +
+          "Raw object for debugging:",
+        obj
+      );
+    }
     return value === undefined ? fallback : value;
   }
 
@@ -282,6 +296,32 @@
     ) {
       return { file: { path: fileData.path, id: fileData.path }, data: fileData.content };
     });
+  };
+
+  /**
+   * entriesByFiles — for `files:`-based collections (fixed named files,
+   * e.g. config.yml's "Programme Pages": growher.md, lae.md, team.md),
+   * as opposed to `folder:`-based collections which list a directory.
+   * Decap calls this method instead of entriesByFolder for that
+   * collection type. Missing this entirely caused
+   * "this.implementation.entriesByFiles is not a function".
+   */
+  NexusGatewayBackend.prototype.entriesByFiles = function (collection) {
+    var filesConfig = cfgGet(collection, "files", []);
+    // filesConfig may itself be an Immutable List, or a plain array.
+    var filesArray =
+      typeof filesConfig.toJS === "function" ? filesConfig.toJS() : filesConfig;
+
+    return Promise.all(
+      filesArray.map(function (fileEntry) {
+        var path = cfgGet(fileEntry, "file");
+        return authedJson("/entries?path=" + encodeURIComponent(path) + "&file=true").then(
+          function (fileData) {
+            return { file: { path: fileData.path, id: fileData.path }, data: fileData.content };
+          }
+        );
+      })
+    );
   };
 
   /**
