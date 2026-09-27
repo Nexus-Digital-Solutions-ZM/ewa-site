@@ -1,15 +1,19 @@
 backend:
-  name: github
-  repo: Nexus-Digital-Solutions-ZM/ewa-site
-  branch: main
-  base_url: https://elevatewomeninagroecology.org
-  auth_endpoint: /api/auth
+  name: nexus-gateway
 
-# GitHub OAuth backend (Vercel-friendly, no Netlify involved).
-# Set up: create a GitHub OAuth App -> add its Client ID/Secret as Vercel env vars
-# (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET) -> the /api/auth and /api/callback
-# serverless functions in this repo handle the login handshake.
-# base_url must match your live Vercel domain (or custom domain once attached).
+# Custom Decap backend (admin/nexus-gateway-backend.js) that talks to the
+# Nexus CMS Gateway instead of GitHub directly. Auth happens via a
+# one-time handoff link from the Gateway's /admin dashboard ("Edit this
+# site" button) — there is no login form here, and the old GitHub OAuth
+# app / Vercel /api/auth /api/callback functions are no longer used by
+# this admin UI (left in place in case anything else still depends on
+# them — not deleted as part of this change).
+# repo/branch/base_url/auth_endpoint below are no longer read by this
+# backend; left commented for reference only.
+# repo: Nexus-Digital-Solutions-ZM/ewa-site
+# branch: main
+# base_url: https://elevatewomeninagroecology.org
+# auth_endpoint: /api/auth
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"

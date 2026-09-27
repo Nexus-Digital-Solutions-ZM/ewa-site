@@ -7,6 +7,17 @@
   <link rel="icon" href="/images/logo.jpg" />
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <!--
+    decap-cms-core (not the auto-init decap-cms.js) so we can register
+    the Nexus Gateway backend BEFORE CMS.init() runs. See
+    nexus-gateway-backend.js and config.yml's backend block
+    (name: nexus-gateway).
+  -->
+  <script src="https://unpkg.com/decap-cms-core@^3.0.0/dist/decap-cms-core.js"></script>
+  <script src="nexus-gateway-backend.js"></script>
+  <script>
+    CMS.registerBackend("nexus-gateway", window.NexusGatewayBackend);
+    CMS.init();
+  </script>
 </body>
 </html>
