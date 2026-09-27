@@ -40,7 +40,7 @@
   // TODO(Paul/Simeon): replace with EWA's real `clients.id` (a cuid) from
   // the Gateway DB — visible in the URL when viewing EWA at
   // https://nexus-cms-gateway.../admin/<this-value>
-  var GATEWAY_CLIENT_ID = "REPLACE_WITH_EWA_CLIENT_ID";
+  var GATEWAY_CLIENT_ID = "cmujs8hwv0000psp77nvpz8la";
 
   if (GATEWAY_CLIENT_ID === "REPLACE_WITH_EWA_CLIENT_ID") {
     // Fail loudly here rather than letting every request 404 against the
