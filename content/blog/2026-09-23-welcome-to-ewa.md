@@ -1,8 +1,9 @@
 ---
-title: "Welcome to Elevate Women in Agroecology"
+title: Welcome to Elevate Women in Agroecology
 date: 2026-09-23
-image: "/images/growher-1.jpg"
-excerpt: "EWA's new website is live — here's what to expect from our GrowHer Urban and Little Agroecology Explorers programmes."
+image: /images/growher-1.jpg
+excerpt: EWA's new website is live  here's what to expect from our GrowHer Urban
+  and Little Agroecology Explorers programmes.
 ---
 
 We're excited to launch our new home online. Elevate Women in Agroecology (EWA) exists to put women at the centre of sustainable food systems — as farmers, educators, entrepreneurs, and stewards of the land.
