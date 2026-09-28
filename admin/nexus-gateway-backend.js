@@ -171,13 +171,6 @@
     } else {
       value = obj[key];
     }
-    if (value === undefined) {
-      console.warn(
-        "[nexus-gateway-backend] cfgGet(\"" + key + "\") returned undefined. " +
-          "Raw object for debugging:",
-        obj
-      );
-    }
     return value === undefined ? fallback : value;
   }
 
@@ -273,7 +266,8 @@
    * tradeoff for EWA's current folder sizes, not an oversight.
    */
   NexusGatewayBackend.prototype.entriesByFolder = function (collection, extension) {
-    var folder = cfgGet(collection, "folder");
+    // Decap 3.19 passes the folder path string directly, not a collection object.
+    var folder = typeof collection === "string" ? collection : cfgGet(collection, "folder");
     return authedJson("/entries?path=" + encodeURIComponent(folder)).then(function (listing) {
       var files = (listing.entries || []).filter(function (e) {
         return e.type === "file" && e.path.endsWith("." + extension);
@@ -307,14 +301,16 @@
    * "this.implementation.entriesByFiles is not a function".
    */
   NexusGatewayBackend.prototype.entriesByFiles = function (collection) {
-    var filesConfig = cfgGet(collection, "files", []);
+    // Decap 3.19 passes the array of file configs directly, not a collection
+    // object wrapping them.
+    var filesConfig = Array.isArray(collection) ? collection : cfgGet(collection, "files", []);
     // filesConfig may itself be an Immutable List, or a plain array.
     var filesArray =
       typeof filesConfig.toJS === "function" ? filesConfig.toJS() : filesConfig;
 
     return Promise.all(
       filesArray.map(function (fileEntry) {
-        var path = cfgGet(fileEntry, "file");
+        var path = typeof fileEntry === "string" ? fileEntry : cfgGet(fileEntry, "file");
         return authedJson("/entries?path=" + encodeURIComponent(path) + "&file=true").then(
           function (fileData) {
             return { file: { path: fileData.path, id: fileData.path }, data: fileData.content };
