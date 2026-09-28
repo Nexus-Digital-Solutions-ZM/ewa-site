@@ -8,19 +8,27 @@
 </head>
 <body>
   <!--
-    decap-cms.js is the fully-bundled build: React, ReactDOM, all standard
-    widgets, and all built-in backends are inside it. Do NOT load React
-    separately — the bundle carries its own and will crash on a version
-    mismatch.
+    decap-cms.js is the fully-bundled build (React, ReactDOM, widgets and
+    built-in backends are inside it) — do NOT load React separately.
 
-    CMS_MANUAL_INIT defers CMS.init() so we can register the Nexus Gateway
-    backend BEFORE the config is read. Without it, decap-cms.js calls
-    CMS.init() immediately on load and the custom backend is never seen.
-
-    Load order matters: set CMS_MANUAL_INIT first, then decap-cms.js,
-    then our backend file, then register + init.
+    Step 1 (this inline script, runs BEFORE Decap loads):
+      - Capture the one-time #nexus_handoff token into
+        window.__NEXUS_HANDOFF__ and clear it from the URL. Decap uses
+        hash routing, so if the token is still in the hash when it boots
+        it tries to open the route "#/nexus_handoff=..." and shows
+        "Not Found". Clearing it first means Decap starts on a clean
+        "#/" and goes to the first collection.
+      - Set CMS_MANUAL_INIT so Decap waits for us to register the Nexus
+        Gateway backend before reading config.yml.
   -->
   <script>
+    (function () {
+      var m = /(?:^|[#&])\/?nexus_handoff=([^&]+)/.exec(window.location.hash || "");
+      if (m) {
+        window.__NEXUS_HANDOFF__ = decodeURIComponent(m[1]);
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+    })();
     window.CMS_MANUAL_INIT = true;
   </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
