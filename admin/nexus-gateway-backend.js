@@ -10,30 +10,33 @@
  * "Edit this site" in the Gateway's /admin dashboard, which redirects
  * here with a one-time token in the URL FRAGMENT:
  *   https://elevatewomeninagroecology.org/admin/#nexus_handoff=<jwt>
- * On load, this file reads that fragment, immediately exchanges it via
- * POST /handoff-exchange for a real session token, and holds that token
- * ONLY in memory (a closure variable below) — never localStorage, never
- * sessionStorage, never sent anywhere except as the Authorization: Bearer
- * header on Gateway API calls. Consequence Grace/Chileshe should know:
- * refreshing this page loses the session — go back to the Nexus dashboard
- * and click "Edit this site" again. That's a deliberate tradeoff (no
- * token sitting in browser storage), not a bug, but worth flagging since
- * it's a real UX difference from the old GitHub-OAuth flow.
  *
- * FIRST PASS / NOT YET RUN AGAINST LIVE DECAP: this targets Decap CMS
- * 3.x's Implementation interface (entriesByFolder / getEntry /
- * persistEntry with `dataFiles` / getMedia / persistMedia / deleteFiles),
- * written from the documented shape rather than tested in a real
- * decap-cms-core runtime. Please dry-run this against a spare branch
- * before pointing Grace at it live — custom-backend shape mismatches
- * (e.g. persistEntry's exact entry object shape) tend to only surface
- * once Decap's actual JS calls in.
+ * admin/index.html captures that fragment BEFORE Decap boots (into
+ * window.__NEXUS_HANDOFF__) and clears it from the URL, so Decap's hash
+ * router starts on a clean "#/" and never tries to route to
+ * "#/nexus_handoff=..." (which rendered "Not Found"). This file then
+ * exchanges the token via POST /handoff-exchange for a real session
+ * token and holds it ONLY in memory (a closure variable below) — never
+ * localStorage, never sessionStorage, never sent anywhere except as the
+ * Authorization: Bearer header on Gateway API calls. Consequence
+ * editors should know: refreshing this page loses the session — go back
+ * to the Nexus dashboard and click "Edit this site" again. That's a
+ * deliberate tradeoff (no token sitting in browser storage), not a bug.
+ *
+ * Decap 3.19 interface notes (learned the hard way, from runtime errors):
+ *   - authComponent() must exist and return a component function.
+ *   - config/collection objects are plain objects, not Immutable Maps.
+ *   - entriesByFolder(folder: string, extension, depth) gets the folder
+ *     path string directly.
+ *   - entriesByFiles(files) gets an array of { path, label } — the key
+ *     is `path`, NOT `file`.
+ *   - Media library cards render thumbnails from `displayURL`.
  */
 (function () {
   "use strict";
 
   // ---------------------------------------------------------------------
-  // Config — fill in GATEWAY_CLIENT_ID before deploying.
+  // Config
   // ---------------------------------------------------------------------
   var GATEWAY_BASE_URL = "https://nexus-cms-gateway.nexus-digital-solutions.workers.dev";
 
@@ -58,6 +61,16 @@
   var exchangePromise = null;
 
   function readHandoffFragment() {
+    // Preferred path: admin/index.html already captured the token before
+    // Decap booted and cleared the URL.
+    if (window.__NEXUS_HANDOFF__) {
+      var early = window.__NEXUS_HANDOFF__;
+      window.__NEXUS_HANDOFF__ = null;
+      return early;
+    }
+
+    // Fallback: the fragment is still in the URL (e.g. index.html was not
+    // updated). Read it and strip it from the address bar.
     var hash = window.location.hash || "";
     var match = /(?:^|[#&])\/?nexus_handoff=([^&]+)/.exec(hash);
     if (!match) return null;
@@ -87,7 +100,7 @@
   }
 
   /**
-   * Ensures we have a session token, exchanging the URL fragment the
+   * Ensures we have a session token, exchanging the handoff token the
    * first time this is called. Safe to call repeatedly — subsequent
    * calls reuse the same in-flight/completed exchange.
    */
@@ -152,14 +165,8 @@
   }
 
   /**
-   * Decap 3.x's Implementation interface was historically documented
-   * (and written here) assuming `config`/`collection` are Immutable.js
-   * Maps accessed via `.get("key")`. This runtime (decap-cms-core 3.19.1)
-   * actually passes plain JS objects instead — confirmed by the runtime
-   * error "collection.get is not a function" / "this.config.get is not
-   * a function". This helper works with either shape so it's safe
-   * regardless of which Decap version/config-passing convention is
-   * actually in effect.
+   * Reads a key from either a plain object or an Immutable-style Map, so
+   * this backend doesn't care which convention a given Decap version uses.
    */
   function cfgGet(obj, key, fallback) {
     if (obj == null) return fallback;
@@ -206,22 +213,15 @@
   };
 
   /**
-   * authComponent — NOT actually optional in this Decap bundle: the
-   * internal Backend wrapper calls `this.implementation.authComponent()`
-   * unconditionally (confirmed via runtime error "authComponent is not
-   * a function" when this method was removed entirely). It must exist
-   * AND return a valid React component (a function), not `null` itself
-   * — returning a bare `null` causes React error #130 ("element type is
-   * invalid ... got: null") because Decap renders the return value
-   * directly as `<AuthComponent />`.
+   * authComponent — NOT optional in this Decap bundle: the internal
+   * Backend wrapper calls `this.implementation.authComponent()`
+   * unconditionally. It must exist AND return a valid component
+   * function, not `null` (React error #130).
    *
-   * Since auth already happens via the handoff-token exchange (no user
-   * credentials needed), this returns a minimal function component that
-   * renders nothing and, on its first render, calls `props.onLogin({})`
-   * once (deferred via setTimeout so it doesn't fire synchronously
-   * during React's render phase, which is disallowed) to immediately
-   * trigger this.authenticate() below — auto-logging in with no visible
-   * login form.
+   * Auth already happens via the handoff-token exchange, so this renders
+   * nothing and, on first render, calls `props.onLogin({})` once
+   * (deferred with setTimeout so it doesn't fire during React's render
+   * phase) to trigger this.authenticate() below with no visible form.
    */
   NexusGatewayBackend.prototype.authComponent = function () {
     var triggered = false;
@@ -238,7 +238,7 @@
     };
   };
 
-  // We never persist the user, so Decap will always end up calling
+  // We never persist the user, so Decap always ends up calling
   // authenticate() on load instead of skipping straight to "logged in".
   NexusGatewayBackend.prototype.restoreUser = function () {
     return Promise.reject(new Error("no persisted Nexus session"));
@@ -261,13 +261,17 @@
 
   /**
    * entriesByFolder — list a collection's folder, then fetch each file's
-   * raw content. N+1 by nature (one /entries list call, then one
-   * /entries?file=true call per file) — flagged by Simeon as an accepted
-   * tradeoff for EWA's current folder sizes, not an oversight.
+   * raw content. N+1 by nature (one list call, then one ?file=true call
+   * per file) — an accepted tradeoff for EWA's current folder sizes.
    */
   NexusGatewayBackend.prototype.entriesByFolder = function (collection, extension) {
-    // Decap 3.19 passes the folder path string directly, not a collection object.
+    // Decap 3.19 passes the folder path string directly.
     var folder = typeof collection === "string" ? collection : cfgGet(collection, "folder");
+    if (!folder) {
+      return Promise.reject(
+        new Error("[nexus-gateway-backend] entriesByFolder: could not work out the folder path")
+      );
+    }
     return authedJson("/entries?path=" + encodeURIComponent(folder)).then(function (listing) {
       var files = (listing.entries || []).filter(function (e) {
         return e.type === "file" && e.path.endsWith("." + extension);
@@ -294,26 +298,44 @@
 
   /**
    * entriesByFiles — for `files:`-based collections (fixed named files,
-   * e.g. config.yml's "Programme Pages": growher.md, lae.md, team.md),
-   * as opposed to `folder:`-based collections which list a directory.
-   * Decap calls this method instead of entriesByFolder for that
-   * collection type. Missing this entirely caused
-   * "this.implementation.entriesByFiles is not a function".
+   * e.g. "Programme Pages": growher.md, lae.md, team.md).
+   *
+   * Decap 3.x passes an array of { path, label } objects. The path key is
+   * `path` — reading `.file` (the config.yml key) gave undefined, which
+   * became "?path=undefined", a 502 from the Gateway and, because that
+   * error response carried no CORS headers, a bare "Failed to fetch".
    */
-  NexusGatewayBackend.prototype.entriesByFiles = function (collection) {
-    // Decap 3.19 passes the array of file configs directly, not a collection
-    // object wrapping them.
-    var filesConfig = Array.isArray(collection) ? collection : cfgGet(collection, "files", []);
-    // filesConfig may itself be an Immutable List, or a plain array.
-    var filesArray =
-      typeof filesConfig.toJS === "function" ? filesConfig.toJS() : filesConfig;
+  NexusGatewayBackend.prototype.entriesByFiles = function (files) {
+    var filesArray = Array.isArray(files)
+      ? files
+      : typeof (files && files.toJS) === "function"
+      ? files.toJS()
+      : cfgGet(files, "files", []);
+    if (typeof filesArray.toJS === "function") filesArray = filesArray.toJS();
 
     return Promise.all(
       filesArray.map(function (fileEntry) {
-        var path = typeof fileEntry === "string" ? fileEntry : cfgGet(fileEntry, "file");
+        var path =
+          typeof fileEntry === "string"
+            ? fileEntry
+            : cfgGet(fileEntry, "path") || cfgGet(fileEntry, "file");
+        var label = typeof fileEntry === "string" ? undefined : cfgGet(fileEntry, "label");
+
+        if (!path) {
+          return Promise.reject(
+            new Error(
+              "[nexus-gateway-backend] entriesByFiles: no path on file entry " +
+                JSON.stringify(fileEntry)
+            )
+          );
+        }
+
         return authedJson("/entries?path=" + encodeURIComponent(path) + "&file=true").then(
           function (fileData) {
-            return { file: { path: fileData.path, id: fileData.path }, data: fileData.content };
+            return {
+              file: { path: fileData.path, label: label, id: fileData.path },
+              data: fileData.content,
+            };
           }
         );
       })
@@ -341,7 +363,7 @@
           path: f.path,
           content: f.raw,
           message: message,
-          action: "update",
+          action: "update", // the Gateway resolves create-vs-update itself
         }),
       });
     });
@@ -352,8 +374,10 @@
   };
 
   /**
-   * getMedia — lists the media folder WITH content (thumbnails), using
-   * the content=true param added to /entries for exactly this purpose.
+   * getMedia — lists the media folder WITH content, using the
+   * content=true param on /entries. Decap's media cards draw their
+   * thumbnails from `displayURL`; without it they fall back to the
+   * "JPG"/"JPEG" placeholder text.
    */
   NexusGatewayBackend.prototype.getMedia = function (folder) {
     var mediaFolder = folder || cfgGet(this.config, "media_folder") || "images/uploads";
@@ -367,7 +391,14 @@
         .map(function (e) {
           var dataUri = "data:" + guessMimeType(e.path) + ";base64," + e.contentBase64;
           var name = e.path.split("/").pop();
-          return { id: e.sha, name: name, size: e.size, url: dataUri, path: e.path };
+          return {
+            id: e.sha,
+            name: name,
+            size: e.size,
+            url: dataUri,
+            displayURL: dataUri,
+            path: e.path,
+          };
         });
     });
   };
@@ -400,11 +431,9 @@
   };
 
   /**
-   * deleteFiles — loops one /commit(action:"delete") call per path, per
-   * item 5 of the spec. Each delete needs the file's current sha first
-   * (the Gateway's /commit requires it), fetched via /entries?file=true.
-   * Sequential, not parallel, to be gentle on the GitHub API and keep
-   * error attribution to a single path clear if one fails partway.
+   * deleteFiles — one /commit(action:"delete") call per path. Each delete
+   * needs the file's current sha first, fetched via /entries?file=true.
+   * Sequential, so an error can be attributed to a single path.
    */
   NexusGatewayBackend.prototype.deleteFiles = function (paths, commitMessage) {
     var message = commitMessage || "Delete via Nexus CMS Gateway";
