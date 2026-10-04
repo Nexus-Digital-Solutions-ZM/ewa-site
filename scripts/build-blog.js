@@ -50,22 +50,6 @@ function pageShell(title, bodyHtml, description) {
   gtag('js', new Date());
   gtag('config', 'G-8C0PW1PDX9');
 </script>
-<style>
-  .post-body{max-width:720px; margin:0 auto; font-size:1.05rem; color:#333;}
-  .post-body h1,.post-body h2,.post-body h3{color:var(--green-deep); margin:28px 0 14px;}
-  .post-body p{margin-bottom:16px;}
-  .post-body img{margin:20px 0; border:1px solid var(--line);}
-  .post-body a{color:var(--green); text-decoration:underline;}
-  .post-meta{color:#8a7a4a; font-size:0.85rem; margin-bottom:10px;}
-  .post-hero{width:100%; max-height:420px; object-fit:cover; margin-bottom:32px; border:1px solid var(--line);}
-  .blog-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:36px;}
-  .blog-card{background:#fff; border-left:3px solid var(--gold); text-decoration:none; color:inherit; display:block; padding:20px;}
-  .blog-card .d{font-size:0.78rem; color:#8a7a4a; margin-bottom:8px;}
-  .blog-card h3{color:var(--green-deep); font-size:1.2rem; margin-bottom:8px;}
-  .blog-card p{color:#444; font-size:0.92rem;}
-  @media (max-width:820px){.blog-grid{grid-template-columns:1fr 1fr;}}
-  @media (max-width:560px){.blog-grid{grid-template-columns:1fr;}}
-</style>
 </head>
 <body>
 <header>
@@ -128,11 +112,11 @@ function buildIndex(posts) {
 
 function buildPost(post) {
   const body = `
-<section class="section-cream" style="padding-top:150px;">
+<section class="section-cream post-section">
   <div class="wrap post-body">
     ${post.image ? `<img class="post-hero" src="${post.image}" alt="${post.title}">` : ''}
     <div class="post-meta">${post.date}</div>
-    <h1 style="color:var(--green-deep); font-size:2.2rem; margin-bottom:20px;">${post.title}</h1>
+    <h1 class="post-title">${post.title}</h1>
     ${post.body}
     <div style="margin-top:40px;"><a href="/blog/index.html" class="btn btn-green">&larr; Back to Updates</a></div>
   </div>
