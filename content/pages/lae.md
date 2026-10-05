@@ -1,7 +1,7 @@
 ---
 status: Coming Soon
 banner_image: /images/lae-banner.jpg
-intro_heading: What's coming🌱
+intro_heading: What's coming
 intro_text: Little Agroecology Explorers is EWA's programme for children —
   animated learning-stories that introduce young minds to agriculture,
   agribusiness, and environmental stewardship in a way that's warm, playful, and
