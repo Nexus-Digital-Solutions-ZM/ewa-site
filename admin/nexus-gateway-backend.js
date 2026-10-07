@@ -34,6 +34,13 @@
  * server error) still surface as a single normal Decap toast, with a
  * plain-English message.
  *
+ * Pause handling: if the Gateway answers 403 with `code: "ACCESS_PAUSED"`
+ * (see guardCmsRequest in the Gateway's lib/cms-guard.ts), the same
+ * full-page panel appears with the "contact the Nexus team" message —
+ * NOT Decap's generic "You don't have permission to do that" toast, and
+ * NOT "Failed to fetch". This covers both an individual editor's
+ * `disabled` flag and a client-wide `suspended` flag.
+ *
  * Decap 3.19 interface notes (learned the hard way, from runtime errors):
  *   - authComponent() must exist and return a component function.
  *   - config/collection objects are plain objects, not Immutable Maps.
@@ -99,6 +106,11 @@
     network: {
       title: "Can’t reach the editing service",
       body: "Check your internet connection, then sign in again.",
+    },
+    paused: {
+      title: "Editing is paused for this account",
+      body:
+        "The Nexus team has paused access for this client. Your content is safe \u2014 contact the Nexus team to have editing restored.",
     },
   };
 
@@ -216,6 +228,12 @@
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (data) {
           if (!res.ok) {
+            // A paused account can also fail here — the handoff-exchange
+            // route runs guardCmsRequest-equivalent checks. Honour the
+            // same code so the panel says "paused", not "expired".
+            if (res.status === 403 && data && data.code === "ACCESS_PAUSED") {
+              throw sessionError("paused", data.error || "Access paused by the Nexus team.");
+            }
             throw sessionError(
               "expired",
               (data && data.error) || "handoff exchange failed (" + res.status + ")"
@@ -285,6 +303,27 @@
               sessionToken = null;
               exchangeError = sessionError("expired", "session no longer valid (401)");
               throw exchangeError;
+            }
+            if (res.status === 403) {
+              // Non-destructive peek: the caller still needs the body if
+              // this turns out NOT to be a pause.
+              return res
+                .clone()
+                .json()
+                .catch(function () {
+                  return {};
+                })
+                .then(function (data) {
+                  if (data && data.code === "ACCESS_PAUSED") {
+                    sessionToken = null;
+                    exchangeError = sessionError(
+                      "paused",
+                      data.error || "Access paused by the Nexus team."
+                    );
+                    throw exchangeError;
+                  }
+                  return res;
+                });
             }
             return res;
           },
